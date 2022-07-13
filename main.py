@@ -7,33 +7,32 @@ for filename in os.listdir('midi'):
     if filename.endswith('.mid'):
         mid = MidiFile('midi/' + filename)
 
+        messages = []
         notes = []
-        times = []
-
+        
         #the only message types that I want to represent
         allowed = ['note_on']
 
         #goes through all messages in file
         for msg in mid:
             if msg.type in allowed:
-                notes.append(msg)
-                times.append(msg.time)
+                messages.append(msg)
+                notes.append(msg.note)
 
         #get the length and width of box
-        size = int(floor(sqrt(len(notes))))
+        size = int(floor(sqrt(len(messages))))
 
         im = Image.new("RGB", (size, size), "white")
 
         color = []
 
-        time_max = max(times)
+        note_max = max(notes)
 
-        for note in notes:
-            red = int((note.time/time_max)*255)
-            green = note.velocity
-            blue = note.note
-
-            color.append([int(red), green, blue])
+        for note in messages:
+            green = min(sum(note.bytes())/1.5, 255)
+            red = note.bytes()[1] + note.bytes()[2]
+            blue = max(abs((note.note/note_max)*255-255), (note.note/note_max)*255)
+            color.append([int(red), int(green), int(blue)])
 
         #go through all spaces in an image 
         for i in range(size):

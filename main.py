@@ -1,33 +1,46 @@
 from mido import MidiFile
 from PIL import Image
 from math import floor, sqrt, sin
+import os
 
-file = 'Backstreet Boys - I Want It That Way.mid'
+for filename in os.listdir('midi'):
+    if filename.endswith('.mid'):
+        mid = MidiFile('midi/' + filename)
 
-#open file
-mid = MidiFile('midi/' + file)
+        notes = []
+        times = []
 
-notes = []
+        #the only message types that I want to represent
+        allowed = ['note_on']
 
-#the only message types that I want to represent
-allowed = ['control_change', 'note_on', 'pitchwheel']
+        #goes through all messages in file
+        for msg in mid:
+            if msg.type in allowed:
+                notes.append(msg)
+                times.append(msg.time)
 
-#goes through all messages in file
-for msg in mid:
-    if msg.type in allowed:
-        notes.append(msg.bytes())
+        #get the length and width of box
+        size = int(floor(sqrt(len(notes))))
 
-#get the length and width of box
-size = int(floor(sqrt(len(notes))))
+        im = Image.new("RGB", (size, size), "white")
 
-im = Image.new("RGB", (size, size), "white")
+        color = []
 
-#go through all spaces in an image 
-for i in range(size):
-   for j in range(size):
-       note = notes[i * size + j]
-       im.putpixel((i, j), tuple(note))
+        time_max = max(times)
 
-im = im.resize((1000, 1000), resample = Image.Dither.NONE)
+        for note in notes:
+            red = int((note.time/time_max)*255)
+            green = note.velocity
+            blue = note.note
 
-im.save('images/%s' % file.replace('.mid', '.png'), 'PNG')
+            color.append([int(red), green, blue])
+
+        #go through all spaces in an image 
+        for i in range(size):
+           for j in range(size):
+               curr = color[i * size + j]
+               im.putpixel((i, j), tuple(curr))
+
+        im = im.resize((1000, 1000), resample = Image.Dither.NONE)
+
+        im.save('images/%s' % filename.replace('.mid', '.png'), 'PNG')

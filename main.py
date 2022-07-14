@@ -23,6 +23,7 @@ for filename in os.listdir('midi'):
         size = int(floor(sqrt(len(messages))))
 
         im = Image.new("RGB", (size, size), "white")
+        im_l = Image.new("RGB", (size, size), "white")
 
         color = []
 
@@ -43,3 +44,22 @@ for filename in os.listdir('midi'):
         im = im.resize((1000, 1000), resample = Image.Dither.NONE)
 
         im.save('images/%s' % filename.replace('.mid', '.png'), 'PNG')
+
+        #copy array
+        order = color[:]
+
+        #order = blue over green ratio * sum of blue green
+        for item in range(0, len(order)):
+            order[item] = (order[item][1] - order[item][2]) * sum(order[item][1:])
+
+        #parellel sort
+        res = sorted(zip(order, color))
+
+        for i in range(size):
+           for j in range(size):
+               curr = res[i * size + j][1]
+               im_l.putpixel((j, i), tuple(curr))
+
+        im_l = im_l.resize((1000, 1000), resample = Image.Dither.NONE)
+
+        im_l.save('landscapes/%s' % filename.replace('.mid', '.png'), 'PNG')

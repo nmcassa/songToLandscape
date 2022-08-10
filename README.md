@@ -19,6 +19,9 @@ and sorting it. The result is meh, kinda looks like a landscape, not really on t
 
 Help is welcome
 
+### Failed attempt
+I've read and tried to implement the possibility of splitting up the sky and the land, then sorting by a contrast level. The reason I wasn't able to finish this is because to do this we need to find the contrast between each pixel and the atmospheric color levels. I don't know what an atmospheric color level is. Also this was slow because we needed to sort through the large array of rgb values multiple more times. 
+
 ## Requires
 ```
 PIL (pillow)
